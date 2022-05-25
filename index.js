@@ -43,7 +43,11 @@ async function run(){
             res.send({ success: 'Product Upload Successfully' })
         })
 
-        
+        app.get('/orders', async(req, res) =>{
+           const query={};
+            const order = await orderCollection.find(query).toArray();
+            res.send(order);
+          })
 
 
     }
