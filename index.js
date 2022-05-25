@@ -19,6 +19,7 @@ async function run(){
         await client.connect();
         console.log('database connected');
         const serviceCollection = client.db('rscomparts').collection('parts');
+        const orderCollection = client.db("rscomparts").collection("orders");
 
         app.get('/parts', async(req, res) =>{
             const query = {};
@@ -32,6 +33,14 @@ async function run(){
             const query={_id:ObjectId(id)}
             const parts=await serviceCollection.findOne(query)
             res.send(parts);
+        })
+
+
+        app.post('/uploadorder', async (req, res) => {
+            const product = req.body;
+            console.log(product)
+            const result = await orderCollection.insertOne(product);
+            res.send({ success: 'Product Upload Successfully' })
         })
 
         
