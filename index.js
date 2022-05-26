@@ -35,6 +35,7 @@ async function run(){
         const serviceCollection = client.db('rscomparts').collection('parts');
         const orderCollection = client.db("rscomparts").collection("orders");
         const userCollection = client.db('rscomparts').collection('users');
+        const reviewCollection = client.db('rscomparts').collection('reviews');
 
        
 
@@ -44,34 +45,47 @@ async function run(){
             const services = await cursor.toArray();
             res.send(services);
         })
+        app.post('/parts', verifyJWT, async (req, res) => {
+          const doctor = req.body;
+          const result = await serviceCollection.insertOne(doctor);
+          res.send(result);
+        });
+      
 
         app.get('/parts/:id', async(req, res) =>{
             const id = req.params.id;
             const query={_id:ObjectId(id)}
             const parts=await serviceCollection.findOne(query)
             res.send(parts);
-        })
+        });
 
 
         app.post('/uploadorder', async (req, res) => {
             const product = req.body;
             console.log(product)
             const result = await orderCollection.insertOne(product);
-            res.send({ success: 'Product Upload Successfully' })
-        })
+            res.send({ success: 'order done' })
+        });
+
+        app.post('/review', async (req, res) => {
+          const product = req.body;
+          console.log(product)
+          const result = await reviewCollection.insertOne(product);
+          res.send({ success: 'review done' })
+      });
 
         app.get('/orders', async(req, res) =>{
            const query={};
             const order = await orderCollection.find(query).toArray();
             res.send(order);
-          })
+          });
 
           app.get('/admin/:email', async(req, res) =>{
             const email = req.params.email;
             const user = await userCollection.findOne({email: email});
             const isAdmin = user.role === 'admin';
             res.send({admin: isAdmin})
-          })
+          });
 
           app.put('/user/admin/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
