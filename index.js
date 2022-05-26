@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
@@ -20,6 +21,7 @@ async function run(){
         console.log('database connected');
         const serviceCollection = client.db('rscomparts').collection('parts');
         const orderCollection = client.db("rscomparts").collection("orders");
+        const userCollection = client.db('rscomparts').collection('users');
 
         app.get('/parts', async(req, res) =>{
             const query = {};
@@ -48,7 +50,18 @@ async function run(){
             const order = await orderCollection.find(query).toArray();
             res.send(order);
           })
-
+          app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+              $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+            res.send({ result, token });
+          })
 
     }
     finally{
