@@ -36,6 +36,7 @@ async function run(){
         const orderCollection = client.db("rscomparts").collection("orders");
         const userCollection = client.db('rscomparts').collection('users');
         const reviewCollection = client.db('rscomparts').collection('reviews');
+        const profileCollection = client.db('rscomparts').collection('profiles');
 
        
 
@@ -44,12 +45,8 @@ async function run(){
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
             res.send(services);
-        })
-        app.post('/parts', verifyJWT, async (req, res) => {
-          const doctor = req.body;
-          const result = await serviceCollection.insertOne(doctor);
-          res.send(result);
         });
+      
       
 
         app.get('/parts/:id', async(req, res) =>{
@@ -79,6 +76,26 @@ async function run(){
             const order = await orderCollection.find(query).toArray();
             res.send(order);
           });
+          app.get('/reviews', async(req, res) =>{
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const services = await cursor.toArray();
+            res.send(services);
+        })
+
+        app.post('/addprofile', async (req, res) => {
+          const product = req.body;
+          console.log(product)
+          const result = await profileCollection.insertOne(product);
+          res.send(result)
+      });
+
+      app.post('/parts', async (req, res) => {
+        const product = req.body;
+        console.log(product)
+        const result = await serviceCollection.insertOne(product);
+        res.send(result)
+    });
 
           app.get('/admin/:email', async(req, res) =>{
             const email = req.params.email;
