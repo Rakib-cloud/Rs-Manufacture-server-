@@ -46,6 +46,11 @@ async function run(){
             const services = await cursor.toArray();
             res.send(services);
         });
+
+        app.get('/parts',verifyJWT, async(req, res) =>{
+          const doctors = await serviceCollection.find().toArray();
+          res.send(doctors);
+      });
       
       
 
