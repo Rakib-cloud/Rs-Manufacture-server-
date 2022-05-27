@@ -81,6 +81,12 @@ async function run(){
             const order = await orderCollection.find(query).toArray();
             res.send(order);
           });
+          app.get('/orders/:id',  async(req, res) =>{
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const order = await orderCollection.findOne(query);
+            res.send(order);
+          })
           app.get('/reviews', async(req, res) =>{
             const query = {};
             const cursor = reviewCollection.find(query);
