@@ -37,6 +37,7 @@ async function run(){
         const userCollection = client.db('rscomparts').collection('users');
         const reviewCollection = client.db('rscomparts').collection('reviews');
         const profileCollection = client.db('rscomparts').collection('profiles');
+      
 
        
 
@@ -86,12 +87,25 @@ async function run(){
             const query = {_id: ObjectId(id)};
             const order = await orderCollection.findOne(query);
             res.send(order);
-          })
+          });
+
+          app.post('/create-payment-intent',  async(req, res) =>{
+            const service = req.body;
+            const price = service.price;
+            const amount = price*100;
+            const paymentIntent = await stripe.paymentIntents.create({
+              amount : amount,
+              currency: 'usd',
+              payment_method_types:['card']
+            });
+            res.send({clientSecret: paymentIntent.client_secret})
+          });
+
           app.get('/reviews', async(req, res) =>{
             const query = {};
             const cursor = reviewCollection.find(query);
-            const services = await cursor.toArray();
-            res.send(services);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
         })
 
         app.post('/addprofile', async (req, res) => {
@@ -131,7 +145,8 @@ async function run(){
               res.status(403).send({message: 'forbidden'});
             }
       
-          })
+          });
+         
 
           app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
